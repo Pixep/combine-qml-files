@@ -1,35 +1,31 @@
 Item {
 	//---------------
 	// @Button
-	Rectangle {
-	    color: baseColor
+	Text {
+	    color: "gray"
 	    width: 100
 	    height: 30
 	
-	    Text {
-	        anchors.centerIn: parent
-	    }
+	    MouseArea {}
 	    //---- Redefinitions ----
-		text: "toto"
+		text: "final text"
 	}
 
-	Toto {
+	Rectangle {
 		color: "blue"
 
 		//---------------
 		// @Button
-		Rectangle {
-		    color: baseColor
+		Text {
 		    width: 100
 		    height: 30
 		
-		    Text {
-		        anchors.centerIn: parent
-		    }
+		    MouseArea {}
 		    //---- Redefinitions ----
-			text: "toto"
-			Text {
-
+			text: "other text"
+			Rectangle {
+				anchors.fill: parent
+				color: Qt.rgba(0, 0, 0, 0.3)
 			}
 		}
 	}

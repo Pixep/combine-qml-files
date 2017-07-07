@@ -1,10 +1,9 @@
 import QtQuick 2.2
-Rectangle {
-    color: baseColor
+Text {
+    color: "gray"
     width: 100
     height: 30
+    text: "original text"
 
-    Text {
-        anchors.centerIn: parent
-    }
+    MouseArea {}
 }

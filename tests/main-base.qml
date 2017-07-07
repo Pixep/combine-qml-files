@@ -1,15 +1,16 @@
 Item {
 	@Button {
-		text: "toto"
+		text: "final text"
 	}
 
-	Toto {
+	Rectangle {
 		color: "blue"
 
 		@Button {
-			text: "toto"
-			Text {
-
+			text: "other text"
+			Rectangle {
+				anchors.fill: parent
+				color: Qt.rgba(0, 0, 0, 0.3)
 			}
 		}
 	}
