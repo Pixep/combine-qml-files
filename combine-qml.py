@@ -1,10 +1,16 @@
 import re
 import os
+import sys
 from shutil import copyfile
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.parse_args()
+parser.add_argument("basefile", help="Base file used to combine QML files together")
+parser.add_argument("destfile", help="Destination file after operation")
+parser.add_argument("-c", "--component", dest="components", required=True, action='append', nargs=2, metavar=('FILE', 'LABEL'),
+                    help="Add a component file to combine, from FILE file, and replacing LABEL from base QML file")
+parser.add_argument("-v", "--verbose", help="Output more information", action="store_true")
+args = parser.parse_args()
 
 def trimComponent(componentLines):
     linesToDelete = []
@@ -47,7 +53,9 @@ def filterRedefinedProperties(componentLines, contentLines):
 
                         contentLines[contentIndex] = newLine
                         deleteLineIndex = lineIndex
-                        print 'merging line ' + linesToAdd[lineIndex].replace('\n', '')
+
+                        if args.verbose:
+                            print 'merging line ' + linesToAdd[lineIndex].replace('\n', '')
                         break
 
             if deleteLineIndex >= 0:
@@ -80,22 +88,22 @@ def mergedComponent(componentLines, contentLines, indentation):
 def mergeComponentInDocument(originalFilePath, componentFilePath, componentName):
     print 'Merging @' + componentName + ' (' + componentFilePath + ') into ' + originalFilePath
 
+    # Open destination file
+    try:
+        originalFile = open(originalFilePath, 'r+')
+    except:
+        print 'Failed to open base file ""' + originalFilePath + '"'
+        return False
+
     # Read component
     try:
         componentFile = open(componentFilePath)
         componentLines = componentFile.readlines()
     except:
-        print 'Failed to open file ' + componentFilePath
-        return
+        print 'Failed to open component file "' + componentFilePath + '"'
+        return False
 
     trimComponent(componentLines)
-
-    # Open destination file
-    try:
-        originalFile = open(originalFilePath, 'r+')
-    except:
-        print 'Failed to open file ' + originalFilePath
-        return
 
     # Insert component in file
     finalFileContent = ''
@@ -133,14 +141,20 @@ def mergeComponentInDocument(originalFilePath, componentFilePath, componentName)
     originalFile.write(finalFileContent)
     originalFile.truncate()
 
-copyfile('tests/main-base.qml', 'tests/main.temp.qml')
-mergeComponentInDocument('tests/main.temp.qml', 'Button.qml', 'Button')
+    return True
 
-print open('tests/main.qml').read()
-os.remove('tests/main.temp.qml')
+workfile = args.basefile + '.tmp'
+copyfile(args.basefile, workfile)
 
-copyfile('ResponsiveHelper-base.qml', 'ResponsiveHelper.temp.qml')
-mergeComponentInDocument('ResponsiveHelper.temp.qml', 'Button.qml', 'Button')
-mergeComponentInDocument('ResponsiveHelper.temp.qml', 'TextField.qml', 'TextField')
-copyfile('ResponsiveHelper.temp.qml', '../ResponsiveHelper.qml')
-os.remove('ResponsiveHelper.temp.qml')
+for comp in args.components:
+    if mergeComponentInDocument(workfile, comp[0], comp[1]) == False:
+        print "Aborting..."
+        sys.exit(1)
+
+copyfile(workfile, args.destfile)
+
+if args.verbose:
+    print open(workfile).read()
+
+os.remove(workfile)
+print "Combination successful"
