@@ -4,11 +4,11 @@ import sys
 from shutil import copyfile
 
 import argparse
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='Integrate components in a base QML file, where the @COMPONENT syntax is used (i.e. @MyButton)')
 parser.add_argument("basefile", help="Base file used to combine QML files together")
 parser.add_argument("destfile", help="Destination file after operation")
-parser.add_argument("-c", "--component", dest="components", required=True, action='append', nargs=2, metavar=('FILE', 'LABEL'),
-                    help="Add a component file to combine, from FILE file, and replacing LABEL from base QML file")
+parser.add_argument("-c", "--component", dest="components", required=True, action='append', nargs=2, metavar=('FILE', 'COMPONENT'),
+                    help="Add a component file to combine, from FILE file, and replacing @COMPONENT from base QML file")
 parser.add_argument("-v", "--verbose", help="Output more information", action="store_true")
 args = parser.parse_args()
 
